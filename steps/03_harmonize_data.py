@@ -257,30 +257,31 @@ silver_schema.user_defined_functions.create(
 )
 for view in pipeline:
     silver_schema.views.create(view, mode=CreateMode.or_replace)
-View(
-    name="attractions",
-    columns=[
-        ViewColumn(name="geo_id"),
-        ViewColumn(name="geo_name"),
-        ViewColumn(name="aquarium_cnt"),
-        ViewColumn(name="zoo_cnt"),
-        ViewColumn(name="korean_restaurant_cnt"),
-    ],
-    query="""
-    select
-        city.geo_id,
-        city.geo_name,
-        count(case when category_main = 'Aquarium' THEN 1 END) aquarium_cnt,
-        count(case when category_main = 'Zoo' THEN 1 END) zoo_cnt,
-        count(case when category_main = 'Korean Restaurant' THEN 1 END) korean_restaurant_cnt
-    from SNOWFLAKE_PUBLIC_DATA_FREE.PUBLIC_DATA_FREE.point_of_interest_index poi
-    join SNOWFLAKE_PUBLIC_DATA_FREE.PUBLIC_DATA_FREE.point_of_interest_addresses_relationships poi_add 
-        on poi_add.poi_id = poi.poi_id
-    join SNOWFLAKE_PUBLIC_DATA_FREE.PUBLIC_DATA_FREE.us_addresses address 
-        on address.address_id = poi_add.address_id
-    join major_us_cities city on city.geo_id = address.id_city
-    where category_main in ('Aquarium', 'Zoo', 'Korean Restaurant')
-      and id_country = 'country/USA'
-    group by city.geo_id, city.geo_name
-    """
-),
+    View(
+        name="attractions",
+        columns=[
+            ViewColumn(name="geo_id"),
+            ViewColumn(name="geo_name"),
+            ViewColumn(name="aquarium_cnt"),
+            ViewColumn(name="zoo_cnt"),
+            ViewColumn(name="korean_restaurant_cnt"),
+        ],
+        query="""
+        select
+            city.geo_id,
+            city.geo_name,
+            count(case when category_main = 'Aquarium' THEN 1 END) aquarium_cnt,
+            count(case when category_main = 'Zoo' THEN 1 END) zoo_cnt,
+            count(case when category_main = 'Korean Restaurant' THEN 1 END) korean_restaurant_cnt
+        from SNOWFLAKE_PUBLIC_DATA_FREE.PUBLIC_DATA_FREE.point_of_interest_index poi
+        join SNOWFLAKE_PUBLIC_DATA_FREE.PUBLIC_DATA_FREE.point_of_interest_addresses_relationships poi_add 
+            on poi_add.poi_id = poi.poi_id
+        join SNOWFLAKE_PUBLIC_DATA_FREE.PUBLIC_DATA_FREE.us_addresses address 
+            on address.address_id = poi_add.address_id
+        join major_us_cities city on city.geo_id = address.id_city
+        where category_main in ('Aquarium', 'Zoo', 'Korean Restaurant')
+          and id_country = 'country/USA'
+        group by city.geo_id, city.geo_name
+        """
+    ),
+]
